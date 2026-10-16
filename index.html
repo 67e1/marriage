@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دعوة ملكية فاخرة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <!-- مكتبة الفرقعة والاحتفال (Confetti) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-light: #f3e5ab;
+            --gold-dark: #aa8c2c;
+            --bg-dark: #07090e;
+            --card-bg: rgba(12, 17, 26, 0.96);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Amiri', serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: 15px;
+        }
+
+        /* خلفية النجوم والجسيمات الذهبية */
+        .stars, .gold-dust {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .stars {
+            background: radial-gradient(circle at center, #111b2b 0%, #07090e 100%);
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .particle {
+            position: absolute;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: floatUp 5s infinite linear;
+            opacity: 0.6;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-20vh) scale(1); opacity: 0; }
+        }
+
+        /* شاشة الغلاف الافتتاحية */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(7, 9, 14, 0.98);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .welcome-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .welcome-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem;
+            color: var(--gold-light);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        }
+
+        .welcome-subtitle {
+            color: #9ca3af;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            font-family: 'Amiri', serif;
+        }
+
+        .open-btn {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: #07090e;
+            border: none;
+            padding: 14px 45px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.7);
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+            50% { transform: scale(1.06); box-shadow: 0 0 35px rgba(212, 175, 55, 0.95); }
+            100% { transform: scale(1); box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
+        }
+
+        /* حاوية البطاقة مع حركة الانفجار في وجهك */
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 480px;
+            opacity: 0;
+            transform: scale(0.2) rotateX(45deg);
+            transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card-container.show {
+            opacity: 1;
+            transform: scale(1) rotateX(0deg);
+        }
+
+        .invitation-card {
+            background: var(--card-bg);
+            border: 2px solid var(--gold);
+            border-radius: 22px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.15);
+            position: relative;
+            backdrop-filter: blur(12px);
+        }
+
+        .invitation-card::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 1px dashed rgba(212, 175, 55, 0.4);
+            border-radius: 15px;
+            pointer-events: none;
+        }
+
+        /* دمج الحرفين الإنجليزيين بتصميم براند عالمي فاخر */
+        .monogram-wrapper {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .monogram-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+            animation: rotateRing 30s linear infinite;
+        }
+
+        @keyframes rotateRing {
+            100% { transform: rotate(360deg); }
+        }
+
+        .monogram-letters {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            direction: ltr;
+        }
+
+        .letter-1 {
+            position: absolute;
+            left: 28px;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 15px rgba(212, 175, 55, 0.8);
+            transform: translateY(-4px) scale(1.05);
+            z-index: 3;
+        }
+
+        .letter-2 {
+            position: absolute;
+            right: 28px;
+            color: var(--gold-light);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 15px rgba(212, 175, 55, 0.9);
+            transform: translateY(4px) scale(0.95);
+            z-index: 2;
+            opacity: 0.95;
+        }
+
+        /* النصوص والتفاصيل */
+        h1 {
+            font-family: 'Amiri', serif;
+            color: var(--gold-light);
+            font-size: 1.7rem;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .guest-box {
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 8px;
+            padding: 6px 14px;
+            margin: 10px 0;
+            display: inline-block;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .guest-name {
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+
+        p {
+            color: #d1d5db;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .event-details {
+            margin: 12px 0;
+            padding: 10px 0;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .event-details div {
+            margin: 4px 0;
+            color: var(--gold-light);
+            font-size: 1rem;
+        }
+
+        .map-link-btn {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 12px;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid var(--gold);
+            border-radius: 15px;
+            color: var(--gold-light);
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .map-link-btn:hover {
+            background: var(--gold);
+            color: var(--bg-dark);
+        }
+
+        /* العداد التنازلي التلقائي */
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin: 15px 0;
+        }
+
+        .countdown-box {
+            background: rgba(7, 9, 14, 0.7);
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            padding: 6px 8px;
+            min-width: 58px;
+            text-align: center;
+            box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.2);
+        }
+
+        .countdown-number {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            color: var(--gold-light);
+            font-weight: bold;
+            display: block;
+        }
+
+        .countdown-label {
+            font-size: 0.7rem;
+            color: #9ca3af;
+        }
+
+        /* زر تأكيد الحضور */
+        .btn-rsvp {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: #07090e;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+            transition: all 0.3s ease;
+            font-family: 'Amiri', serif;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .btn-rsvp:hover {
+            transform: scale(1.03);
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        }
+
+        /* زر كتم وتشغيل الصوت */
+        .music-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(15, 20, 30, 0.9);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            z-index: 100;
+        }
+
+        /* نافذة تأكيد الحضور */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s ease;
+            z-index: 1000;
+            padding: 15px;
+        }
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            border: 2px solid var(--gold);
+            padding: 25px 20px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 320px;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="stars" id="stars"></div>
+    <div class="gold-dust" id="goldDust"></div>
+
+    <!-- شاشة الغلاف الافتتاحية -->
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-title">افتح الدعوة ✨</div>
+        <div class="welcome-subtitle"></div>
+        <button class="open-btn" id="openCardBtn"> دعوة عرس 🎁</button>
+    </div>
+
+    <!-- زر التحكم بالصوت -->
+    <button class="music-toggle" id="musicBtn" title="كتم/تشغيل الصوت">🎵</button>
+
+    <!-- ملف الصوت الخاص بك (تأكد أن الملف بنفس المجلد ومسمى كـ qnJrE0X_tqE.m4a أو قم بتعديل الاسم هنا) -->
+    <audio id="bgAudio" loop>
+        <source src="qnJrE0X_tqE.m4a" type="audio/mp4">
+    </audio>
+
+    <div class="card-container" id="cardContainer">
+        <div class="invitation-card" id="invCard">
+            
+            <!-- الحرفين الإنجليزيين المدمجين (مثال: A و M) -->
+            <div class="monogram-wrapper">
+                <div class="monogram-circle"></div>
+                <div class="monogram-letters">
+                    <!-- غير الحرفين أدناه لأي حرفين إنجليزيين تريدهما -->
+                    <span class="letter-1" id="firstLetter">A</span>
+                    <span class="letter-2" id="secondLetter">A</span>
+                </div>
+            </div>
+
+            <h1>دعوة حضور مباركة</h1>
+            
+            <div class="guest-box">
+                <span>إلى الضيف الكريم </span>
+                <span class="guest-name" id="guestName"> </span>
+            </div>
+
+            <p>يسعدنا ويشرفنا حضوركم حفلنا المبارك ومشاركتنا أثمن اللحظات التي تبقى محفورة في الذاكرة للأبد.</p>
+
+            <div class="event-details">
+                <div>📅 الجمعة، 20 أكتوبر 2026</div>
+                <div>⏰ السابعة مساءً</div>
+                <div>📍 القاعة الملكية الكبرى، بغداد</div>
+                <a href="https://maps.google.com" target="_blank" class="map-link-btn">🗺️ عرض الموقع على الخريطة</a>
+            </div>
+
+            <!-- العداد التنازلي التلقائي بالثواني والدقائق -->
+            <div class="countdown-container">
+                <div class="countdown-box">
+                    <span class="countdown-number" id="seconds">00</span>
+                    <span class="countdown-label">ثانية</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-number" id="minutes">00</span>
+                    <span class="countdown-label">دقيقة</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-number" id="hours">00</span>
+                    <span class="countdown-label">ساعة</span>
+                </div>
+                <div class="countdown-box">
+                    <span class="countdown-number" id="days">00</span>
+                    <span class="countdown-label">يوم</span>
+                </div>
+            </div>
+
+            <button class="btn-rsvp" id="rsvpBtn">تأكيد الحضور ✨</button>
+        </div>
+    </div>
+
+    <!-- نافذة تأكيد الحضور -->
+    <div class="modal" id="rsvpModal">
+        <div class="modal-content">
+            <h2 style="color: var(--gold); margin-bottom: 12px; font-family: 'Reem Kufi'; font-size: 1.3rem;">شكراً لحضوركم!</h2>
+            <p style="font-size: 0.9rem; color: #d1d5db;">تم تسجيل تأكيد حضوركم بنجاح في القائمة الخاصة. بانتظار إطلالتكم البهية.</p>
+            <button class="btn-rsvp" id="closeModal" style="margin-top: 15px; padding: 6px 20px; font-size: 0.95rem;">إغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. توليد النجوم والجسيمات الذهبية
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 40; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = Math.random() * 2.5 + 'px';
+            star.style.height = star.style.width;
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        const dustContainer = document.getElementById('goldDust');
+        for (let i = 0; i < 15; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 4 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = Math.random() * 4 + 3 + 's';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            dustContainer.appendChild(particle);
+        }
+
+        // 2. زر فتح الهدية (تشغيل الصوت، تفجير الفرقعة، وظهور البطاقة بوجهك)
+        const welcomeOverlay = document.getElementById('welcomeOverlay');
+        const cardContainer = document.getElementById('cardContainer');
+        const musicBtn = document.getElementById('musicBtn');
+        const bgAudio = document.getElementById('bgAudio');
+
+        document.getElementById('openCardBtn').addEventListener('click', () => {
+            welcomeOverlay.classList.add('hidden');
+            cardContainer.classList.add('show');
+            musicBtn.style.display = 'flex';
+            
+            // تشغيل الصوت
+            bgAudio.play().catch((err) => {
+                console.log("Audio play blocked or path issue:", err);
+            });
+
+            // تأثير الفرقعة الحقيقي (Confetti Explosion)
+            confetti({
+                particleCount: 130,
+                spread: 110,
+                origin: { y: 0.6 },
+                colors: ['#d4af37', '#f3e5ab', '#ffffff', '#aa8c2c']
+            });
+
+            // فرقعة جانبية إضافية لإعطاء حماس أكبر
+            setTimeout(() => {
+                confetti({
+                    particleCount: 90,
+                    angle: 60,
+                    spread: 60,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 90,
+                    angle: 120,
+                    spread: 60,
+                    origin: { x: 1 }
+                });
+            }, 300);
+        });
+
+        // زر كتم وتشغيل الصوت
+        let isMuted = false;
+        musicBtn.addEventListener('click', () => {
+            if (isMuted) {
+                bgAudio.play();
+                musicBtn.textContent = '🎵';
+                isMuted = false;
+            } else {
+                bgAudio.pause();
+                musicBtn.textContent = '🔇';
+                isMuted = true;
+            }
+        });
+
+        // 3. قراءة اسم الضيف والحرفين ديناميكياً من الرابط (مثال: ?l1=F&l2=S&name=امير)
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const guestParam = urlParams.get('name');
+        if (guestParam) {
+            document.getElementById('guestName').textContent = decodeURIComponent(guestParam);
+        }
+
+        const l1 = urlParams.get('l1');
+        const l2 = urlParams.get('l2');
+        if (l1) document.getElementById('firstLetter').textContent = decodeURIComponent(l1);
+        if (l2) document.getElementById('secondLetter').textContent = decodeURIComponent(l2);
+
+        // 4. العداد التنازلي التلقائي بالثواني والدقائق (فقط حدد تاريخ الحفل هنا وسيحسب تلقائياً)
+        const eventDate = new Date("October 20, 2026 19:00:00").getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = eventDate - now;
+
+            if (distance < 0) {
+                document.getElementById("days").textContent = "00";
+                document.getElementById("hours").textContent = "00";
+                document.getElementById("minutes").textContent = "00";
+                document.getElementById("seconds").textContent = "00";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").textContent = String(days).padStart(2, '0');
+            document.getElementById("hours").textContent = String(hours).padStart(2, '0');
+            document.getElementById("minutes").textContent = String(minutes).padStart(2, '0');
+            document.getElementById("seconds").textContent = String(seconds).padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // 5. نافذة تأكيد الحضور
+        const rsvpBtn = document.getElementById('rsvpBtn');
+        const rsvpModal = document.getElementById('rsvpModal');
+        const closeModal = document.getElementById('closeModal');
+
+        rsvpBtn.addEventListener('click', () => rsvpModal.classList.add('active'));
+        closeModal.addEventListener('click', () => rsvpModal.classList.remove('active'));
+    </script>
+</body>
+</html>
